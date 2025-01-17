@@ -1,0 +1,196 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Slots</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="manage-bookings">
+        <div class="header-actions">
+            <h3><a href="{% url 'index' %}">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a> Bookings</h3>
+            <button class="search-btn" onclick="openSearchModal()">
+                <i class="fa-solid fa-search"></i> Search Bookings
+            </button>
+        </div>
+    
+
+        <div id="searchModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Search Bookings</h3>
+                    <button class="close-btn" onclick="closeSearchModal()">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                
+                <form method="get" class="search-form">
+                    <div class="form-group">
+                        <label for="date">Search by Date:</label>
+                        <input type="date" id="date" name="date" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reference">Search by Reference:</label>
+                        <input type="text" id="reference" name="reference" 
+                               class="form-control" 
+                               placeholder="Enter booking reference">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">Search</button>
+                        <button type="button" class="reset-btn" onclick="resetSearch()">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        {% if grouped_bookings %}
+            {% for date, bookings in grouped_bookings.items %}
+            <div class="date-section">
+                <h3 class="date-heading">{{ date|date:"l, d F Y" }}</h3>
+                
+                <div class="bookings-grid">
+                    {% for booking in bookings %}
+                    <div class="booking-card">
+                        <div class="booking-header">
+                            <h4>Booking {{ booking.reference }}</h4>
+                            {% if booking.status == 'pending' %}
+                            <div class="menu-container">
+                                <button class="action-menu-btn" onclick="toggleActions('{{ booking.id }}')">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                
+                                <!-- Popup Menu -->
+                                <div id="actions-popup-{{ booking.id }}" class="actions-popup">
+                                    <form method="post" action="{% url 'validate_booking' booking.id %}" class="popup-form">
+                                        {% csrf_token %}
+                                        <button type="submit" name="action" value="validate" class="popup-btn success">
+                                            Mark as Collected <i class="fa-solid fa-check-to-slot"></i>
+                                        </button>
+                                        <button type="submit" name="action" value="delete" class="popup-btn danger">
+                                            Delete <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="booking-info">
+                            <p><strong>User:</strong> {{ booking.user.username }}</p>
+                            <p><strong>Time:</strong> {{ booking.time_slot.time }}</p>
+                            <p>
+                                <strong>Status:</strong>
+                                <span class="status-badge status-{{ booking.status }}">
+                                    {{ booking.status|title }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-bookings">
+                <p>No upcoming bookings found.</p>
+            </div>
+        {% endif %}
+    </div>
+
+
+    <script>
+        // Close all popups when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.menu-container')) {
+                const popups = document.querySelectorAll('.actions-popup');
+                popups.forEach(popup => {
+                    popup.style.display = 'none';
+                    popup.classList.remove('top');
+                });
+            }
+        });
+        
+        function toggleActions(bookingId) {
+            event.stopPropagation();
+            
+            // Close all other popups
+            const popups = document.querySelectorAll('.actions-popup');
+            popups.forEach(popup => {
+                if (popup.id !== `actions-popup-${bookingId}`) {
+                    popup.style.display = 'none';
+                    popup.classList.remove('top');
+                }
+            });
+            
+            const popup = document.getElementById(`actions-popup-${bookingId}`);
+            const button = event.currentTarget;
+            const buttonRect = button.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            
+            // Clear any previous positioning
+            popup.style.removeProperty('top');
+            popup.style.removeProperty('bottom');
+            
+            // Calculate if there's more space above or below the button
+            const spaceBelow = viewportHeight - buttonRect.bottom;
+            const spaceAbove = buttonRect.top;
+            
+            // If there's not enough space below, show popup above
+            if (spaceBelow < 150 && spaceAbove > spaceBelow) {
+                popup.classList.add('top');
+            } else {
+                popup.classList.remove('top');
+            }
+            
+            // Toggle display
+            popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+        }
+
+
+        function openSearchModal() {
+            document.getElementById('searchModal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+        
+        function closeSearchModal() {
+            document.getElementById('searchModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+        
+        function resetSearch() {
+            document.getElementById('date').value = '';
+            document.getElementById('reference').value = '';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('searchModal');
+            if (event.target == modal) {
+                closeSearchModal();
+            }
+        }
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeSearchModal();
+            }
+        });
+        </script>
+</body>
+</html>
+
+
+
+
+

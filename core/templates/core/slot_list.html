@@ -1,0 +1,145 @@
+{% load static %} {% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="{% static 'css/list.css' %}" />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+        <title>Book Slot</title>
+        <style></style>
+    </head>
+    <body>
+        <nav class="navbar">
+            <a href="{% url 'index' %}" class="logo"></a>
+            <div class="quote_btn-container">
+                <a href="{% url 'index' %}" class="sign-up">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                {% if user.is_staff %}
+                <a href="{% url 'create_slots' %}" class="sign-up">CREATE SLOTS</a>
+                <a href="{% url 'manage_bookings' %}" class="sign-up">MANAGE SLOTS</a>
+                {% else %}
+                <a href="{% url 'my_bookings' %}" class="sign-up">MY BOOKINGS</a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="sign-up">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </nav>
+        {% if messages %}
+        <div class="alerts">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="color: red">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <h2>Available Slots</h2>
+        <div class="slot-list">
+            <button id="openModalBtn" class="search-btn"><i class="fas fa-search"></i> Search</button>
+            <div id="filterModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Search Bookings</h3>
+                        <button class="close-btn" onclick="closeSearchModal()">
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </div>
+                    <form method="get" class="search-form">
+                        <div class="form-group">
+                            <label for="filter_date">Filter by Date:</label>
+                            <input
+                                type="date"
+                                id="filter_date"
+                                name="filter_date"
+                                class="form-control"
+                                value="{{ filter_date|date:'Y-m-d' }}"
+                            />
+                        </div>
+                        <div class="form-group">
+                            <label for="min_available_slots">Min Available Slots:</label>
+                            <input
+                                type="number"
+                                id="min_available_slots"
+                                name="min_available_slots"
+                                class="form-control"
+                                value="{{ min_available_slots }}"
+                                min="1"
+                            />
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="submit-btn">Search</button>
+                            <button type="button" class="reset-btn" onclick="resetSearch()">Reset</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% if slots_by_date %} {% for date, slots in slots_by_date.items %}
+            <div class="date-group">
+                <h3>{{ date|date:"d F Y" }}</h3>
+                <div class="slots">
+                    {% for slot in slots %}
+                    <div class="slot-card">
+                        <div class="slot-time">{{ slot.time }}</div>
+                        <div class="slot-availability">
+                            <div class="progress-bar">
+                                <div
+                                    class="progress"
+                                    style="width: {% widthratio slot.booked_count slot.capacity 100 %}%"
+                                ></div>
+                            </div>
+                            <span>{{ slot.available_slots }} slots available</span>
+                        </div>
+                        {% if slot.is_available %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="slot_id" value="{{ slot.id }}" />
+                            <button type="submit" class="btn">Book Now</button>
+                        </form>
+                        {% else %}
+                        <span class="fully-booked">Fully Booked</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %} {% else %}
+            <p>No slots available based on your filter criteria.</p>
+            {% endif %}
+        </div>
+        <script src="{% static 'js/financials.js' %}"></script>
+        <script>
+            function closeSearchModal() {
+                const modal = document.getElementById("filterModal");
+                if (modal) {
+                    modal.style.display = "none";
+                    document.body.style.overflow = "auto";
+                } else {
+                    console.error("Element with ID 'filterModal' not found.");
+                }
+            }
+            function resetSearch() {
+                document.getElementById("date").value = "";
+                document.getElementById("reference").value = "";
+            }
+            document.getElementById("openModalBtn").onclick = function () {
+                const modal = document.getElementById("filterModal");
+                modal.style.display = "flex";
+                document.body.style.overflow = "hidden";
+            };
+            window.onclick = function (event) {
+                const modal = document.getElementById("filterModal");
+                if (event.target === modal) {
+                    closeSearchModal();
+                }
+            };
+        </script>
+    </body>
+</html>

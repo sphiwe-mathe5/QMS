@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+        <title>My Bookings</title>
+        <link rel="stylesheet" href="{% static 'css/list.css' %}" />
+    </head>
+    <body>
+        <nav class="navbar">
+            <a href="{% url 'index' %}" class="logo"></a>
+            <div class="quote_btn-container">
+                <a href="{% url 'index' %}" class="sign-up">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <a href="{% url 'slot_list' %}"  class="sign-up">BOOK SLOTS</a>
+                <a href="{% url 'logout' %}" class="sign-up">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </nav>
+
+        {% if messages %}
+        <div class="alerts">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}" style="color: green">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="my-bookings">
+            <h2>My Bookings</h2>
+            {% if bookings %}
+            <div class="bookings-list">
+                {% for booking in bookings %}
+                <div class="booking-card">
+                    <div class="booking-header">
+                        <div class="booking-ref"><strong>Reference:</strong> {{ booking.reference }}</div>
+                        <div class="booking-status">
+                            <span class="status-badge status-{{ booking.status }}"> {{ booking.status|title }} </span>
+                        </div>
+                    </div>
+                    <div class="booking-details">
+                        <div class="booking-date">
+                            <strong>Date:</strong> {{ booking.time_slot.date|date:"F d, Y" }}
+                        </div>
+                        <div class="booking-time"><strong>Time:</strong> {{ booking.time_slot.time }}</div>
+                    </div>
+                    <div class="booking-created">
+                        <small>Booked on: {{ booking.created_at|date:"F d, Y H:i" }}</small>
+                    </div>
+                    <div class="menu-container">
+                        <button class="action-menu-btn" onclick="toggleActions('{{ booking.id }}')">
+                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                        </button>
+                        <div id="actions-popup-{{ booking.id }}" class="actions-popup">
+                            <form method="post" action="{% url 'cancel_booking' booking.id %}" class="popup-form">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="delete" class="popup-btn danger">
+                                    Cancel Booking <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="no-bookings">You haven't made any bookings yet.</p>
+            {% endif %}
+        </div>
+        <script>
+            // Close all popups when clicking outside
+            document.addEventListener("click", function (event) {
+                if (!event.target.closest(".menu-container")) {
+                    const popups = document.querySelectorAll(".actions-popup");
+                    popups.forEach((popup) => {
+                        popup.style.display = "none";
+                        popup.classList.remove("top");
+                    });
+                }
+            });
+            function toggleActions(bookingId) {
+                event.stopPropagation();
+                // Close all other popups
+                const popups = document.querySelectorAll(".actions-popup");
+                popups.forEach((popup) => {
+                    if (popup.id !== `actions-popup-${bookingId}`) {
+                        popup.style.display = "none";
+                        popup.classList.remove("top");
+                    }
+                });
+                const popup = document.getElementById(`actions-popup-${bookingId}`);
+                const button = event.currentTarget;
+                const buttonRect = button.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                // Clear any previous positioning
+                popup.style.removeProperty("top");
+                popup.style.removeProperty("bottom");
+                // Calculate if there's more space above or below the button
+                const spaceBelow = viewportHeight - buttonRect.bottom;
+                const spaceAbove = buttonRect.top;
+                if (spaceBelow < 150 && spaceAbove > spaceBelow) {
+                    popup.classList.add("top");
+                } else {
+                    popup.classList.remove("top");
+                }
+                popup.style.display = popup.style.display === "none" ? "block" : "none";
+            }
+            function openSearchModal() {
+                document.getElementById("searchModal").style.display = "block";
+                document.body.style.overflow = "hidden";
+            }
+            function closeSearchModal() {
+                document.getElementById("searchModal").style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+            function resetSearch() {
+                document.getElementById("date").value = "";
+                document.getElementById("reference").value = "";
+            }
+            window.onclick = function (event) {
+                const modal = document.getElementById("searchModal");
+                if (event.target == modal) {
+                    closeSearchModal();
+                }
+            };
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    closeSearchModal();
+                }
+            });
+        </script>
+    </body>
+</html>

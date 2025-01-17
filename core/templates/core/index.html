@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styless.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+    <title>QMS</title>
+    <link rel="stylesheet" type="text/css" href="static/css/bootstrap.css" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet" />
+    <link href="static/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="static/css/responsive.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  {% if not user.is_authenticated %}
+
+    <div class="button-container">
+      <a href="{% url 'login' %}" class="button">LOG IN</a>
+      <a href="{% url 'signup' %}"class="button">RESISTER</a>
+    </div>
+
+  {% else %}
+  <div class="button-container">
+    {% if user.is_staff %}
+    <a href="{% url 'create_slots' %}"  class="button">CREATE SLOTS</a>
+    <a href="{% url 'manage_bookings' %}"  class="button">MANAGE SLOTS</a>
+    {% else %}
+    <a href="{% url 'slot_list' %}"  class="button">BOOK SLOTS</a>
+    <a href="{% url 'my_bookings' %}"  class="button">MY BOOKINGS</a>
+    {% endif %}
+    <div class="user-icon" id="userIcon" onclick="togglePopup()">
+      {% if user.profile_picture %}
+          <img src="{{ user.profile_picture }}" alt="Profile Picture" class="profile-picture">
+      {% else %}
+          {{ user.email|slice:":1"|upper }}
+      {% endif %}
+  </div>
+    {% endif %}
+
+</div>
+
+
+<div id="userPopup" class="user-popup">
+  <div class="popup-content">
+    <p class="user-name"><strong>{{ user.company_name }}</strong></p>
+    <p class="user-email">{{ user.email }}</p>
+    <ol class="popup-menu">
+      <li>
+        <a href="{% url 'profile' %}" class="menu-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+      <li>
+        <a href="{% url 'logout' %}" class="menu-item">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          <span>Log Out</span>
+        </a>
+      </li>
+    </ol>
+  </div>
+</div>
+
+</div>
+</div>
+
+  <div class="hero_area">
+    <section class="about_section layout_padding long_section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="img-box">
+              <img src="static/images/heroimg.png" alt="">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="detail-box">
+              <div class="heading_container">
+                <h3>
+                  Queue Mananagement
+                </h3>
+              </div>
+              <p>
+                Queue Management App lets people book time slots to avoid waiting in long lines. 
+                It organizes customers by different days and times, making the process faster and 
+                more efficient. With a booked slot, customers can choose time and days which are 
+                convinient for them to buy,  which helps to and save time
+              </p>
+            </div>
+            <div class="quote_btn-container">
+              <a href="{% url 'guide' %}" class="sign-up"><span>How to use this App ?</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+<footer class="footer">
+  <div class="container2">
+    <div class="footer_inner">
+      <div class="c-footer">
+        <div class="layout">
+          <div class="layout_item w-50">
+            <div class="newsletter">
+              <h4 class="newsletter_title">Subscribe to get exciting news about deployments,<br>upcoming events and more.</h4><br><br>
+              <form action="#" method="POST">
+                {% csrf_token %}
+                <input type="email" name="email"placeholder="Your email address">
+                <button>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="none" d="M0 0h24v24H0z" />
+                    <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" />
+                  </svg>
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="layout_item w-25">
+            <nav class="c-nav-tool">
+              <h4 class="c-nav-tool_title">Menu</h4>
+              <ul class="c-nav-tool_list">
+                <li>
+                  <a href="#" class="c-link">About Us</a>
+                </li>
+                <li>
+                  <a href="#" class="c-link">Contact Us</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <div class="layout_item w-25">
+            <nav class="c-nav-tool">
+              <h4 class="c-nav-tool_title">Support</h4>
+              <ul class="c-nav-tool_list">
+                <li class="c-nav-tool_item">
+                  <a href="#" class="c-link">Terms &amp; Conditions</a>
+                </li>
+                <li class="c-nav-tool_item">
+                  <a href="#" class="c-link">Privacy Policy</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <div class="layout c-2">
+          <div class="layout_item w-50">
+            <ul class="flex">
+                <a href="{% url 'index' %}" class="logos"><img src="{% static 'images/KasiAlgo.png' %}" alt="Logo" width="250" height="50"></a>
+              </li>
+            </ul>
+          </div>
+          <div class="footer-section">
+            <h4 class="newsletter_title">Follow Us</h4>
+            <div class="social-icons">
+                <a href="https://www.linkedin.com/" target="_blank" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://www.instagram.com/kasialgorithms/profilecard/?igsh=MTVzYXJpMzhnZWJ5bg==" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61561356537135&mibextid=LQQJ4d" target="_blank" aria-label="Facebook">
+                    <i class="fab fa-facebook"></i>
+                </a>
+            </div>
+        </div>
+          <div class="layout_item w-25" style="display: flex; justify-content: end; align-items: center;">
+            <button id="scrollToTopButton" style="background: none; border: none; cursor: pointer;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36">
+                <path fill="none" d="M0 0h24v24H0z" />
+                <path d="M12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm1 10h3l-4-4-4 4h3v4h2v-4z" />
+              </svg>
+            </button>
+        </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer_copyright">
+      <p>Developed and Maintained by &copy; 2024 Kasi Algorithms</p>
+    </div>
+  </div>
+</footer>
+
+    <script src="static/js/jquery-3.4.1.min.js"></script>
+    <script src="static/js/bootstrap.js"></script>
+    <script src="static/js/index.js"></script>
+</body>
+</html>

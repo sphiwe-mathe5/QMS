@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+    <title>QMS</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600,700&display=swap" rel="stylesheet" />
+</head>
+
+<body>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --text-color: #1f2937;
+            --light-bg: #f3f4f6;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .guide-header {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: var(--primary-color);
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .guide-header h1 {
+            margin: 0;
+            font-size: 1 rem;
+        }
+        .guide-header a {
+            color: white;
+            text-decoration : none;
+        }
+
+        .guide-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .step {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            background-color: var(--primary-color);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .important-note {
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .warning {
+            background-color: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        ul {
+            padding-left: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .guide-section {
+                padding: 1rem;
+            }
+
+            .guide-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="guide-header">
+        <h1><a href="{% url 'index' %}" class="sign-up">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a> Booking System User Guide</h1>
+    </div>
+    
+    <div class="container">
+        <div class="guide-section">
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h2 class="step-title">Account Access</h2>
+                </div>
+                <p>Before making a booking, you'll need to access your account:</p>
+                <ul>
+                    <li><strong>New Users:</strong> Click the "Register" button and complete the registration form with your details.</li>
+                    <li><strong>Existing Users:</strong> Use the "Login" button and enter your credentials.</li>
+                </ul>
+                <div class="important-note">
+                    Make sure to verify your email address after registration to access all booking features.
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h2 class="step-title">Booking Process</h2>
+                </div>
+                <p>Follow these steps to make your booking:</p>
+                <ul>
+                    <li><strong>Find the "Book Slots" Button:</strong> Located at the top of your dashboard.</li>
+                    <li><strong>Select Date:</strong> Browse through available dates in the calendar view.</li>
+                    <li><strong>Choose Time:</strong> Available time slots will be displayed for your selected date.</li>
+                    <li><strong>Confirm Booking:</strong> Click "Book Slot" to secure your reservation.</li>
+                </ul>
+                <div class="important-note">
+                    <strong>Important:</strong> After booking, you'll receive a unique reference number. This reference is crucial for collection - write it down or save it in your phone.
+                </div>
+                <p>Your booking details page will show:</p>
+                <ul>
+                    <li>Booking reference number</li>
+                    <li>Selected date and time</li>
+                    <li>Status of your booking</li>
+                    <li>Collection instructions</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h2 class="step-title">Managing Your Booking</h2>
+                </div>
+                <p>Important information about your booking:</p>
+                <ul>
+                    <li>View your current booking in the "My Bookings" section</li>
+                    <li>Cancel your booking through the "Cancel Booking" button if needed</li>
+                    <li>Track the status of your booking (Active/Expired)</li>
+                </ul>
+                <div class="warning">
+                    <strong>Please Note:</strong>
+                    <ul>
+                        <li>You cannot make a new booking until you collect or cancel your current booking</li>
+                        <li>Bookings automatically expire if not collected on the scheduled date</li>
+                        <li>Expired bookings must be cancelled before making a new reservation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
